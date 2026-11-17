@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: UI + API tests in Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build test image
+        # UID of the runner user, so the container can write into ./reports
+        run: docker build --build-arg UID="$(id -u)" -t qa-automation-tests .
+
+      - name: Run tests
+        run: |
+          mkdir -p reports
+          docker run --rm -v "$PWD/reports:/reports" qa-automation-tests
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: reports/
+          if-no-files-found: warn

@@ -1,0 +1,9 @@
+# Only pom.xml, src/ and run-tests.sh are needed in the image
+target/
+reports/
+.allure/
+.git/
+.github/
+.idea/
+.vscode/
+*.iml
